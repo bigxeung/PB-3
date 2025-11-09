@@ -52,6 +52,55 @@ Vue 3 + Vite + TypeScript로 구현한 **9가지 디자인 패턴** 학습 프�
 
 ---
 
+## 📸 스크린샷
+
+### 🏗️ 생성 패턴 (Creational Patterns)
+
+<div align="center">
+
+#### Singleton Pattern
+<img src="./img/singleton.png" alt="Singleton Pattern" width="700"/>
+
+#### Factory Method Pattern
+<img src="./img/factoryMethod.png" alt="Factory Method Pattern" width="700"/>
+
+#### Abstract Factory Pattern
+<img src="./img/abstractFactory.png" alt="Abstract Factory Pattern" width="700"/>
+
+</div>
+
+### 🔧 구조 패턴 (Structural Patterns)
+
+<div align="center">
+
+#### Adapter Pattern
+<img src="./img/adaptor.png" alt="Adapter Pattern" width="700"/>
+
+#### Decorator Pattern
+<img src="./img/decorator.png" alt="Decorator Pattern" width="700"/>
+
+#### Proxy Pattern
+<img src="./img/proxy.png" alt="Proxy Pattern" width="700"/>
+
+</div>
+
+### 🎭 행위 패턴 (Behavioral Patterns)
+
+<div align="center">
+
+#### Observer Pattern
+<img src="./img/observer.png" alt="Observer Pattern" width="700"/>
+
+#### Visitor Pattern
+<img src="./img/visitor.png" alt="Visitor Pattern" width="700"/>
+
+#### State Pattern
+<img src="./img/state.png" alt="State Pattern" width="700"/>
+
+</div>
+
+---
+
 ## 🚀 시작하기
 
 ### 📋 사전 요구사항
