@@ -170,95 +170,137 @@ console.log(image.display());
 </script>
 
 <style scoped>
-/* 이전과 동일한 스타일 재사용 */
+/* 프록시 패턴 - 시안 그라디언트 테마 */
 .pattern-container {
-  padding: 2rem;
-  max-width: 900px;
+  padding: 2.5rem;
+  max-width: 950px;
   margin: 20px auto;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  background: linear-gradient(145deg, #f0feff 0%, #e0f9ff 100%);
+  border: 4px solid transparent;
+  border-radius: 30px;
+  box-shadow: 0 10px 40px rgba(168, 237, 234, 0.15);
+  position: relative;
+  overflow: hidden;
 }
+
+.pattern-container::before {
+  content: '🩵';
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 3rem;
+  opacity: 0.3;
+}
+
 h2 {
-  color: #2c3e50;
-  margin-bottom: 0.5rem;
+  color: #00b8d4;
+  margin-bottom: 0.8rem;
+  font-size: 2rem;
+  font-weight: 800;
+  text-shadow: 2px 2px 4px rgba(0, 184, 212, 0.1);
 }
+
 .description {
-  color: #666;
+  color: #00acc1;
   margin-bottom: 2rem;
-  line-height: 1.6;
-  background-color: #f8f9fa;
-  padding: 16px;
-  border-radius: 8px;
+  line-height: 1.8;
+  background: rgba(255, 255, 255, 0.8);
+  padding: 20px;
+  border-radius: 20px;
+  border-left: 5px solid #a8edea;
+  font-size: 1.05rem;
+  box-shadow: 0 4px 15px rgba(168, 237, 234, 0.1);
 }
+
 .example-section {
-  background: #f8f9fa;
-  padding: 1.5rem;
-  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 2rem;
+  border-radius: 25px;
   margin-bottom: 2rem;
+  border: 3px solid rgba(168, 237, 234, 0.2);
+  box-shadow: 0 8px 25px rgba(168, 237, 234, 0.1);
 }
+
 .example-section h3 {
   margin-top: 0;
+  color: #26c6da;
+  font-size: 1.5rem;
+  font-weight: 700;
 }
 .example-section p {
-  font-size: 15px;
-  color: #333;
+  font-size: 16px;
+  color: #555;
+  line-height: 1.7;
 }
+
 .button-group {
   display: flex;
   gap: 1rem;
-  margin-top: 1rem;
-  flex-wrap: wrap; /* 버튼이 많아지면 줄바꿈 */
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
 }
+
 .test-btn {
-  background: #42b983;
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 4px;
+  padding: 1rem 2rem;
+  border-radius: 50px;
   cursor: pointer;
+  font-weight: 700;
+  font-size: 15px;
+  box-shadow: 0 6px 20px rgba(168, 237, 234, 0.3);
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  margin-top: 0.5rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 .test-btn:hover {
-  background: #36a473;
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(168, 237, 234, 0.4);
 }
-.test-btn:nth-of-type(2) {
-  background: #3498db;
+.test-btn:active {
+  transform: translateY(0) scale(0.98);
 }
-.test-btn:nth-of-type(2):hover {
-  background: #2980b9;
-}
-.test-btn.alt {
-  /* 세 번째 버튼 */
-  background: #e67e22;
-}
-.test-btn.alt:hover {
-  background: #d35400;
-}
+
 .output {
   margin-top: 1.5rem;
-  background: #2c3e50;
-  color: #ecf0f1;
-  padding: 1rem;
-  border-radius: 4px;
-  white-space: pre-wrap;
-  max-height: 300px;
-  overflow-y: auto; /* 출력이 길어지면 스크롤 */
-}
-.code-section {
-  background: #282c34;
+  background: linear-gradient(135deg, #00b8d4 0%, #0097a7 100%);
+  color: #fff;
   padding: 1.5rem;
-  border-radius: 8px;
+  border-radius: 20px;
+  white-space: pre-wrap;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 15px;
+  line-height: 1.6;
+  box-shadow: 0 8px 25px rgba(0, 184, 212, 0.3);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.code-section {
+  background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3e 100%);
+  padding: 2rem;
+  border-radius: 25px;
   overflow-x: auto;
+  border: 3px solid rgba(168, 237, 234, 0.3);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
 }
+
 .code-section h4 {
-  color: #abb2bf;
+  color: #a8edea;
   margin-top: 0;
-  border-bottom: 1px solid #444;
-  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #a8edea;
+  padding-bottom: 0.8rem;
+  font-size: 1.3rem;
+  font-weight: 700;
 }
+
 .code-section pre {
-  color: #abb2bf;
-  font-family: 'Courier New', monospace;
-  font-size: 14px;
+  color: #e0e0e0;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 15px;
+  line-height: 1.7;
+  margin: 0;
 }
 </style>
