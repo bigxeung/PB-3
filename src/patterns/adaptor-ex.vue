@@ -18,6 +18,32 @@
       </div>
     </div>
 
+    <div class="comparison-section">
+      <h3>📊 비교: 올바른 방법 vs 잘못된 방법</h3>
+      <p>어댑터 패턴을 사용했을 때와 사용하지 않았을 때의 차이를 확인해보세요.</p>
+
+      <div class="button-group">
+        <button @click="showGoodExample" class="good-btn">✅ 올바른 방법 (어댑터 사용)</button>
+        <button @click="showBadExample" class="bad-btn">❌ 잘못된 방법 (직접 호출)</button>
+      </div>
+
+      <div class="output good-output" v-if="goodOutput">
+        <div class="output-header">✅ 올바른 방법: 어댑터 사용</div>
+        <pre>{{ goodOutput }}</pre>
+        <div class="explanation">
+          💡 <strong>장점:</strong> 어댑터가 인터페이스를 변환해주므로 클라이언트 코드 수정 없이 기존 클래스를 사용할 수 있습니다.
+        </div>
+      </div>
+
+      <div class="output bad-output" v-if="badOutput">
+        <div class="output-header">❌ 잘못된 방법: 클라이언트가 직접 호출</div>
+        <pre>{{ badOutput }}</pre>
+        <div class="explanation">
+          ⚠️ <strong>문제점:</strong> 클라이언트가 Adaptee의 인터페이스에 직접 의존하면, 인터페이스 변경 시 모든 클라이언트 코드를 수정해야 합니다.
+        </div>
+      </div>
+    </div>
+
     <div class="code-section">
       <h4>코드:</h4>
       <pre><code>{{ codeExample }}</code></pre>
@@ -86,9 +112,34 @@ class Client {
   }
 }
 
+// --- Bad Example: 클라이언트가 Adaptee를 직접 사용 시도 ---
+class BadClient {
+  public sendDataDirectly(oldService: OldAnalyticsService) {
+    try {
+      // 문제: 클라이언트가 원하는 sendRequest() 메서드가 없음
+      // @ts-expect-error - 의도적인 타입 에러 (예제를 위해)
+      const result = oldService.sendRequest({ type: 'purchase', amount: 15000 })
+      return result
+    } catch (error) {
+      return [
+        '❌ 에러 발생!',
+        `메시지: ${error instanceof Error ? error.message : String(error)}`,
+        '',
+        '문제 원인:',
+        '- OldAnalyticsService에는 sendRequest() 메서드가 없습니다.',
+        '- 클라이언트가 기대하는 인터페이스와 불일치',
+        '',
+        '해결책: 어댑터 패턴을 사용하여 인터페이스를 변환하세요!',
+      ].join('\n')
+    }
+  }
+}
+
 // --- Vue 로직 ---
 
 const output = ref<string>('')
+const goodOutput = ref<string>('')
+const badOutput = ref<string>('')
 
 const runClientCode = () => {
   // 1. 기존의 서비스(Adaptee) 생성
@@ -104,6 +155,47 @@ const runClientCode = () => {
   // 4. 클라이언트에게 어댑터를 (Target 인터페이스인 척) 주입
   // 클라이언트는 자신이 어댑터를 사용하는지 모름
   output.value = client.sendData(adapter)
+}
+
+const showGoodExample = () => {
+  badOutput.value = '' // 다른 출력 숨기기
+
+  // 어댑터 패턴 사용
+  const oldService = new OldAnalyticsService()
+  const adapter = new AnalyticsAdapter(oldService)
+  const client = new Client()
+
+  const result = client.sendData(adapter)
+
+  const results = [
+    '--- 어댑터 패턴 사용 ---',
+    '',
+    result,
+    '',
+    '✅ 어댑터가 인터페이스 변환을 담당',
+    '✅ 클라이언트는 Target 인터페이스만 알면 됨',
+    '✅ 기존 코드(OldAnalyticsService) 수정 불필요',
+    '✅ 클라이언트 코드 수정 불필요',
+  ]
+
+  goodOutput.value = results.join('\n')
+}
+
+const showBadExample = () => {
+  goodOutput.value = '' // 다른 출력 숨기기
+
+  const oldService = new OldAnalyticsService()
+  const badClient = new BadClient()
+
+  const result = badClient.sendDataDirectly(oldService)
+
+  const results = [
+    '--- 어댑터 미사용 (직접 호출 시도) ---',
+    '',
+    result,
+  ]
+
+  badOutput.value = results.join('\n')
 }
 
 const codeExample = `// 1. Adaptee (기존 클래스)
@@ -189,7 +281,8 @@ h2 {
   box-shadow: 0 4px 15px rgba(250, 112, 154, 0.1);
 }
 
-.example-section {
+.example-section,
+.comparison-section {
   background: rgba(255, 255, 255, 0.9);
   padding: 2rem;
   border-radius: 25px;
@@ -198,13 +291,15 @@ h2 {
   box-shadow: 0 8px 25px rgba(250, 112, 154, 0.1);
 }
 
-.example-section h3 {
+.example-section h3,
+.comparison-section h3 {
   margin-top: 0;
   color: #ff7979;
   font-size: 1.5rem;
   font-weight: 700;
 }
-.example-section p {
+.example-section p,
+.comparison-section p {
   font-size: 16px;
   color: #555;
   line-height: 1.7;
@@ -217,18 +312,23 @@ h2 {
   flex-wrap: wrap;
 }
 
-.test-btn {
-  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-  color: white;
+.test-btn,
+.good-btn,
+.bad-btn {
   border: none;
   padding: 1rem 2rem;
   border-radius: 50px;
   cursor: pointer;
   font-weight: 700;
   font-size: 15px;
-  box-shadow: 0 6px 20px rgba(250, 112, 154, 0.3);
   transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   margin-top: 0.5rem;
+}
+
+.test-btn {
+  background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+  color: white;
+  box-shadow: 0 6px 20px rgba(250, 112, 154, 0.3);
 }
 .test-btn:hover {
   transform: translateY(-3px) scale(1.05);
@@ -236,6 +336,26 @@ h2 {
 }
 .test-btn:active {
   transform: translateY(0) scale(0.98);
+}
+
+.good-btn {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  color: white;
+  box-shadow: 0 6px 20px rgba(67, 233, 123, 0.3);
+}
+.good-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(67, 233, 123, 0.4);
+}
+
+.bad-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+  color: white;
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+}
+.bad-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
 }
 
 .output {
@@ -250,6 +370,35 @@ h2 {
   line-height: 1.6;
   box-shadow: 0 8px 25px rgba(255, 99, 72, 0.3);
   border: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.good-output {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  border: 3px solid rgba(67, 233, 123, 0.3);
+  box-shadow: 0 8px 25px rgba(67, 233, 123, 0.3);
+}
+
+.bad-output {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+  border: 3px solid rgba(255, 107, 107, 0.3);
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+}
+
+.output-header {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.explanation {
+  margin-top: 1.2rem;
+  padding-top: 1.2rem;
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+  font-size: 14px;
+  line-height: 1.7;
+  font-family: 'Segoe UI', Arial, sans-serif;
 }
 
 .code-section {

@@ -18,6 +18,32 @@
       </div>
     </div>
 
+    <div class="comparison-section">
+      <h3>📊 비교: 올바른 방법 vs 잘못된 방법</h3>
+      <p>팩토리 메서드 패턴을 사용했을 때와 사용하지 않았을 때의 차이를 확인해보세요.</p>
+
+      <div class="button-group">
+        <button @click="showGoodExample" class="good-btn">✅ 올바른 방법 (팩토리 메서드 사용)</button>
+        <button @click="showBadExample" class="bad-btn">❌ 잘못된 방법 (직접 생성)</button>
+      </div>
+
+      <div class="output good-output" v-if="goodOutput">
+        <div class="output-header">✅ 올바른 방법: 팩토리 메서드 사용</div>
+        <pre>{{ goodOutput }}</pre>
+        <div class="explanation">
+          💡 <strong>장점:</strong> 클라이언트 코드는 추상 인터페이스만 사용하므로 느슨한 결합이 유지됩니다. 새로운 운송 수단(비행기 등)을 추가해도 클라이언트 코드 수정이 불필요합니다.
+        </div>
+      </div>
+
+      <div class="output bad-output" v-if="badOutput">
+        <div class="output-header">❌ 잘못된 방법: 클라이언트가 직접 구체 클래스 생성</div>
+        <pre>{{ badOutput }}</pre>
+        <div class="explanation">
+          ⚠️ <strong>문제점:</strong> 클라이언트 코드가 구체 클래스(Truck, Ship)에 직접 의존하여 강한 결합이 발생합니다. 새로운 운송 수단을 추가하면 클라이언트 코드도 수정해야 합니다.
+        </div>
+      </div>
+    </div>
+
     <div class="code-section">
       <h4>코드:</h4>
       <pre><code>{{ codeExample }}</code></pre>
@@ -81,9 +107,26 @@ class SeaLogistics extends Logistics {
   }
 }
 
+// --- Bad Example: 클라이언트가 직접 구체 클래스 생성 ---
+class BadClient {
+  public deliver(type: 'road' | 'sea'): string {
+    // 클라이언트 코드가 구체 클래스에 직접 의존 (강한 결합)
+    if (type === 'road') {
+      const truck = new Truck() // 직접 생성
+      return `[클라이언트] ${truck.deliver()}`
+    } else {
+      const ship = new Ship() // 직접 생성
+      return `[클라이언트] ${ship.deliver()}`
+    }
+    // 문제점: 새로운 운송 수단 추가 시 이 클라이언트 코드를 수정해야 함
+  }
+}
+
 // --- Vue 로직 ---
 
 const output = ref<string>('')
+const goodOutput = ref<string>('')
+const badOutput = ref<string>('')
 let logistics: Logistics // Creator 타입으로 변수 선언
 
 const runLogistics = (type: 'road' | 'sea') => {
@@ -97,6 +140,55 @@ const runLogistics = (type: 'road' | 'sea') => {
 
   // 어떤 Creator가 선택되었든, 클라이언트는 동일한 planDelivery() 메서드를 호출
   output.value = logistics.planDelivery()
+}
+
+const showGoodExample = () => {
+  badOutput.value = '' // 다른 출력 숨기기
+
+  // 팩토리 메서드 패턴 사용: 클라이언트는 추상 타입만 사용
+  const roadLogistics: Logistics = new RoadLogistics()
+  const seaLogistics: Logistics = new SeaLogistics()
+
+  const results = [
+    '--- 팩토리 메서드 패턴 사용 ---',
+    '',
+    '1. 육상 운송:',
+    roadLogistics.planDelivery(),
+    '',
+    '2. 해상 운송:',
+    seaLogistics.planDelivery(),
+    '',
+    '✅ 클라이언트는 Logistics 인터페이스만 알면 됩니다.',
+    '✅ 새로운 운송 수단(비행기) 추가 시:',
+    '   - AirLogistics 클래스만 추가',
+    '   - 클라이언트 코드는 수정 불필요',
+  ]
+
+  goodOutput.value = results.join('\n')
+}
+
+const showBadExample = () => {
+  goodOutput.value = '' // 다른 출력 숨기기
+
+  const badClient = new BadClient()
+
+  const results = [
+    '--- 직접 생성 방식 (팩토리 메서드 미사용) ---',
+    '',
+    '1. 육상 운송:',
+    badClient.deliver('road'),
+    '',
+    '2. 해상 운송:',
+    badClient.deliver('sea'),
+    '',
+    '❌ 클라이언트가 Truck, Ship 구체 클래스를 직접 알아야 합니다.',
+    '❌ 새로운 운송 수단(비행기) 추가 시:',
+    '   - Plane 클래스 추가',
+    '   - BadClient의 deliver() 메서드에 else if 분기 추가 필요',
+    '   - 클라이언트 코드 수정 필요 (강한 결합)',
+  ]
+
+  badOutput.value = results.join('\n')
 }
 
 const codeExample = `// 1. Product (제품 인터페이스)

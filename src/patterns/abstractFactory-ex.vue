@@ -19,6 +19,32 @@
       </div>
     </div>
 
+    <div class="comparison-section">
+      <h3>📊 비교: 올바른 방법 vs 잘못된 방법</h3>
+      <p>추상 팩토리 패턴을 사용했을 때와 사용하지 않았을 때의 차이를 확인해보세요.</p>
+
+      <div class="button-group">
+        <button @click="showGoodExample" class="good-btn">✅ 올바른 방법 (추상 팩토리 사용)</button>
+        <button @click="showBadExample" class="bad-btn">❌ 잘못된 방법 (직접 조합)</button>
+      </div>
+
+      <div class="output good-output" v-if="goodOutput">
+        <div class="output-header">✅ 올바른 방법: 추상 팩토리 사용</div>
+        <pre>{{ goodOutput }}</pre>
+        <div class="explanation">
+          💡 <strong>장점:</strong> 팩토리가 관련된 제품군의 일관성을 보장합니다. 테마를 변경해도 모든 UI 요소가 자동으로 동일한 스타일로 유지됩니다.
+        </div>
+      </div>
+
+      <div class="output bad-output" v-if="badOutput">
+        <div class="output-header">❌ 잘못된 방법: 클라이언트가 직접 제품 조합</div>
+        <pre>{{ badOutput }}</pre>
+        <div class="explanation">
+          ⚠️ <strong>문제점:</strong> 클라이언트가 각 제품을 직접 선택하면 일관성 없는 조합(Windows 버튼 + Mac 체크박스)이 발생할 수 있습니다. UI 일관성이 깨집니다.
+        </div>
+      </div>
+    </div>
+
     <div class="code-section">
       <h4>코드:</h4>
       <pre><code>{{ codeExample }}</code></pre>
@@ -120,9 +146,28 @@ class Application {
   }
 }
 
+// --- Bad Example: 클라이언트가 직접 제품 조합 ---
+class BadClient {
+  public createMixedUI(): string {
+    // 문제: 서로 다른 테마의 제품을 섞어서 사용 (일관성 없음)
+    const winButton = new WinButton() // Windows 버튼
+    const macCheckbox = new MacCheckbox() // Mac 체크박스
+
+    return [
+      winButton.paint(),
+      macCheckbox.paint(),
+      '',
+      '⚠️ Windows 버튼과 Mac 체크박스가 섞여있습니다!',
+      '⚠️ UI 일관성이 깨졌습니다!',
+    ].join('\n')
+  }
+}
+
 // --- Vue 로직 ---
 
 const output = ref<string>('')
+const goodOutput = ref<string>('')
+const badOutput = ref<string>('')
 let factory: GUIFactory
 let app: Application
 
@@ -140,6 +185,56 @@ const createUI = (os: 'Windows' | 'Mac') => {
   // UI 생성 및 렌더링
   app.createUI()
   output.value = `[ ${os} 테마 적용됨 ]\n` + app.paintUI()
+}
+
+const showGoodExample = () => {
+  badOutput.value = '' // 다른 출력 숨기기
+
+  // 추상 팩토리 사용: 팩토리가 일관된 제품군 보장
+  const winFactory: GUIFactory = new WinFactory()
+  const macFactory: GUIFactory = new MacFactory()
+
+  const winApp = new Application(winFactory)
+  winApp.createUI()
+
+  const macApp = new Application(macFactory)
+  macApp.createUI()
+
+  const results = [
+    '--- 추상 팩토리 패턴 사용 ---',
+    '',
+    '1. Windows 테마:',
+    winApp.paintUI(),
+    '',
+    '2. macOS 테마:',
+    macApp.paintUI(),
+    '',
+    '✅ 각 팩토리가 일관된 제품군을 생성합니다.',
+    '✅ Windows 팩토리는 Windows 제품만 생성',
+    '✅ Mac 팩토리는 Mac 제품만 생성',
+    '✅ 테마 일관성이 자동으로 보장됩니다!',
+  ]
+
+  goodOutput.value = results.join('\n')
+}
+
+const showBadExample = () => {
+  goodOutput.value = '' // 다른 출력 숨기기
+
+  const badClient = new BadClient()
+
+  const results = [
+    '--- 직접 조합 방식 (추상 팩토리 미사용) ---',
+    '',
+    badClient.createMixedUI(),
+    '',
+    '❌ 클라이언트가 각 제품을 직접 선택하면:',
+    '   - Windows 버튼 + Mac 체크박스 같은 일관성 없는 조합 발생',
+    '   - UI 테마가 뒤죽박죽 섞임',
+    '   - 사용자 경험 저하',
+  ]
+
+  badOutput.value = results.join('\n')
 }
 
 const codeExample = `// 1. AbstractProduct (제품 인터페이스)
@@ -230,7 +325,8 @@ h2 {
   box-shadow: 0 4px 15px rgba(67, 233, 123, 0.1);
 }
 
-.example-section {
+.example-section,
+.comparison-section {
   background: rgba(255, 255, 255, 0.9);
   padding: 2rem;
   border-radius: 25px;
@@ -239,13 +335,15 @@ h2 {
   box-shadow: 0 8px 25px rgba(67, 233, 123, 0.1);
 }
 
-.example-section h3 {
+.example-section h3,
+.comparison-section h3 {
   margin-top: 0;
   color: #1dd1a1;
   font-size: 1.5rem;
   font-weight: 700;
 }
-.example-section p {
+.example-section p,
+.comparison-section p {
   font-size: 16px;
   color: #555;
   line-height: 1.7;
@@ -258,18 +356,23 @@ h2 {
   flex-wrap: wrap;
 }
 
-.test-btn {
-  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-  color: white;
+.test-btn,
+.good-btn,
+.bad-btn {
   border: none;
   padding: 1rem 2rem;
   border-radius: 50px;
   cursor: pointer;
   font-weight: 700;
   font-size: 15px;
-  box-shadow: 0 6px 20px rgba(67, 233, 123, 0.3);
   transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   margin-top: 0.5rem;
+}
+
+.test-btn {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  color: white;
+  box-shadow: 0 6px 20px rgba(67, 233, 123, 0.3);
 }
 .test-btn:hover {
   transform: translateY(-3px) scale(1.05);
@@ -277,6 +380,26 @@ h2 {
 }
 .test-btn:active {
   transform: translateY(0) scale(0.98);
+}
+
+.good-btn {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  color: white;
+  box-shadow: 0 6px 20px rgba(67, 233, 123, 0.3);
+}
+.good-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(67, 233, 123, 0.4);
+}
+
+.bad-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+  color: white;
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+}
+.bad-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
 }
 
 .output {
@@ -291,6 +414,35 @@ h2 {
   line-height: 1.6;
   box-shadow: 0 8px 25px rgba(16, 172, 132, 0.3);
   border: 3px solid rgba(255, 255, 255, 0.2);
+}
+
+.good-output {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  border: 3px solid rgba(67, 233, 123, 0.3);
+  box-shadow: 0 8px 25px rgba(67, 233, 123, 0.3);
+}
+
+.bad-output {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+  border: 3px solid rgba(255, 107, 107, 0.3);
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+}
+
+.output-header {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.explanation {
+  margin-top: 1.2rem;
+  padding-top: 1.2rem;
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+  font-size: 14px;
+  line-height: 1.7;
+  font-family: 'Segoe UI', Arial, sans-serif;
 }
 
 .code-section {

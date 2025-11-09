@@ -20,6 +20,32 @@
       </div>
     </div>
 
+    <div class="comparison-section">
+      <h3>📊 비교: 올바른 방법 vs 잘못된 방법</h3>
+      <p>상태 패턴을 사용했을 때와 사용하지 않았을 때의 차이를 확인해보세요.</p>
+
+      <div class="button-group">
+        <button @click="showGoodExample" class="good-btn">✅ 올바른 방법 (상태 패턴)</button>
+        <button @click="showBadExample" class="bad-btn">❌ 잘못된 방법 (if/else 분기)</button>
+      </div>
+
+      <div class="output good-output" v-if="goodOutput">
+        <div class="output-header">✅ 올바른 방법: 상태 패턴 사용</div>
+        <pre>{{ goodOutput }}</pre>
+        <div class="explanation">
+          💡 <strong>장점:</strong> 각 상태의 행동이 State 클래스로 분리되어 있어 새로운 상태 추가 시 기존 코드 수정이 불필요합니다. 상태 전이 로직이 명확합니다.
+        </div>
+      </div>
+
+      <div class="output bad-output" v-if="badOutput">
+        <div class="output-header">❌ 잘못된 방법: if/else 조건문 사용</div>
+        <pre>{{ badOutput }}</pre>
+        <div class="explanation">
+          ⚠️ <strong>문제점:</strong> 모든 상태 로직이 하나의 클래스에 집중되어 복잡해지고, 새로운 상태 추가 시 기존 코드를 수정해야 합니다.
+        </div>
+      </div>
+    </div>
+
     <div class="code-section">
       <h4>코드:</h4>
       <pre><code>{{ codeExample }}</code></pre>
@@ -105,6 +131,8 @@ class YellowState implements TrafficLightState {
 // --- Vue 로직 ---
 
 const output = ref<string>('')
+const goodOutput = ref<string>('')
+const badOutput = ref<string>('')
 let trafficLight: TrafficLightContext
 
 onMounted(() => {
@@ -118,6 +146,67 @@ const changeState = () => {
   // 실제 행동과 상태 전이는 캡슐화된 State 객체들이 알아서 처리
   const result = trafficLight.request()
   output.value = result
+}
+
+const showGoodExample = () => {
+  badOutput.value = ''
+
+  const results = [
+    '--- 상태 패턴 사용 ---',
+    '',
+    'Context 클래스:',
+    '  - 현재 상태만 보유',
+    '  - request() 메서드 하나만 존재',
+    '  - 상태별 로직 없음 (위임)',
+    '',
+    '각 State 클래스:',
+    '  - RedState: 정지 행동 + Green으로 전이',
+    '  - GreenState: 진행 행동 + Yellow로 전이',
+    '  - YellowState: 주의 행동 + Red로 전이',
+    '',
+    '새로운 상태 추가 (BlinkingState):',
+    '  - BlinkingState 클래스 추가',
+    '  - Context 수정 불필요',
+    '  - 다른 State 수정 불필요',
+    '',
+    '✅ 각 상태의 로직이 분리되어 유지보수 쉬움',
+  ]
+
+  goodOutput.value = results.join('\n')
+}
+
+const showBadExample = () => {
+  goodOutput.value = ''
+
+  const results = [
+    '--- if/else 조건문 사용 (상태 패턴 미사용) ---',
+    '',
+    'class TrafficLight {',
+    '  private currentState: string;',
+    '',
+    '  request() {',
+    '    if (currentState === "red") {',
+    '      console.log("🔴 정지");',
+    '      currentState = "green";',
+    '    } else if (currentState === "green") {',
+    '      console.log("🟢 진행");',
+    '      currentState = "yellow";',
+    '    } else if (currentState === "yellow") {',
+    '      console.log("🟡 주의");',
+    '      currentState = "red";',
+    '    }',
+    '  }',
+    '}',
+    '',
+    '새로운 상태 추가 (blinking):',
+    '  - request() 메서드에 else if 추가',
+    '  - 기존 코드 수정 필요',
+    '  - 조건문이 길어지고 복잡해짐',
+    '',
+    '❌ 모든 로직이 한 곳에 집중되어 복잡함',
+  ]
+
+  badOutput.value = results.join('\n')
 }
 
 const codeExample = `// 1. Context (문맥)
@@ -222,7 +311,8 @@ h2 {
   box-shadow: 0 4px 15px rgba(224, 195, 252, 0.1);
 }
 
-.example-section {
+.example-section,
+.comparison-section {
   background: rgba(255, 255, 255, 0.9);
   padding: 2rem;
   border-radius: 25px;
@@ -231,13 +321,15 @@ h2 {
   box-shadow: 0 8px 25px rgba(142, 197, 252, 0.1);
 }
 
-.example-section h3 {
+.example-section h3,
+.comparison-section h3 {
   margin-top: 0;
   color: #8e9aff;
   font-size: 1.5rem;
   font-weight: 700;
 }
-.example-section p {
+.example-section p,
+.comparison-section p {
   font-size: 16px;
   color: #555;
   line-height: 1.7;
@@ -250,18 +342,23 @@ h2 {
   flex-wrap: wrap;
 }
 
-.test-btn {
-  background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
-  color: white;
+.test-btn,
+.good-btn,
+.bad-btn {
   border: none;
   padding: 1rem 2rem;
   border-radius: 50px;
   cursor: pointer;
   font-weight: 700;
   font-size: 15px;
-  box-shadow: 0 6px 20px rgba(142, 197, 252, 0.3);
   transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   margin-top: 0.5rem;
+}
+
+.test-btn {
+  background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+  color: white;
+  box-shadow: 0 6px 20px rgba(142, 197, 252, 0.3);
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 .test-btn:hover {
@@ -270,6 +367,26 @@ h2 {
 }
 .test-btn:active {
   transform: translateY(0) scale(0.98);
+}
+
+.good-btn {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  color: white;
+  box-shadow: 0 6px 20px rgba(67, 233, 123, 0.3);
+}
+.good-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(67, 233, 123, 0.4);
+}
+
+.bad-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+  color: white;
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+}
+.bad-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
 }
 
 .output {
@@ -285,6 +402,39 @@ h2 {
   box-shadow: 0 8px 25px rgba(107, 123, 255, 0.3);
   border: 3px solid rgba(255, 255, 255, 0.2);
   text-align: center;
+}
+
+.good-output {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  border: 3px solid rgba(67, 233, 123, 0.3);
+  box-shadow: 0 8px 25px rgba(67, 233, 123, 0.3);
+  text-align: left;
+  font-size: 15px;
+}
+
+.bad-output {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+  border: 3px solid rgba(255, 107, 107, 0.3);
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+  text-align: left;
+  font-size: 15px;
+}
+
+.output-header {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.explanation {
+  margin-top: 1.2rem;
+  padding-top: 1.2rem;
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+  font-size: 14px;
+  line-height: 1.7;
+  font-family: 'Segoe UI', Arial, sans-serif;
 }
 
 .code-section {

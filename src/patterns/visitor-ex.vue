@@ -21,6 +21,32 @@
       </div>
     </div>
 
+    <div class="comparison-section">
+      <h3>📊 비교: 올바른 방법 vs 잘못된 방법</h3>
+      <p>비지터 패턴을 사용했을 때와 사용하지 않았을 때의 차이를 확인해보세요.</p>
+
+      <div class="button-group">
+        <button @click="showGoodExample" class="good-btn">✅ 올바른 방법 (비지터 패턴)</button>
+        <button @click="showBadExample" class="bad-btn">❌ 잘못된 방법 (Element에 메서드 추가)</button>
+      </div>
+
+      <div class="output good-output" v-if="goodOutput">
+        <div class="output-header">✅ 올바른 방법: 비지터 패턴 사용</div>
+        <pre>{{ goodOutput }}</pre>
+        <div class="explanation">
+          💡 <strong>장점:</strong> 새로운 연산 추가 시 Visitor 클래스만 추가하면 되므로 Element 클래스를 수정할 필요가 없습니다. 데이터와 로직이 분리됩니다.
+        </div>
+      </div>
+
+      <div class="output bad-output" v-if="badOutput">
+        <div class="output-header">❌ 잘못된 방법: Element에 직접 메서드 추가</div>
+        <pre>{{ badOutput }}</pre>
+        <div class="explanation">
+          ⚠️ <strong>문제점:</strong> 새로운 연산 추가 시마다 모든 Element 클래스를 수정해야 합니다. 로직이 여러 클래스에 분산되어 유지보수가 어렵습니다.
+        </div>
+      </div>
+    </div>
+
     <div class="code-section">
       <h4>코드:</h4>
       <pre><code>{{ codeExample }}</code></pre>
@@ -107,6 +133,8 @@ class PerimeterCalculator implements ShapeVisitor {
 // --- Vue 로직 ---
 
 const output = ref<string>('')
+const goodOutput = ref<string>('')
+const badOutput = ref<string>('')
 
 // 1. Element(도형) 객체 구조 생성
 const shapes: Shape[] = [
@@ -135,6 +163,73 @@ const runVisitor = (type: 'area' | 'perimeter') => {
   }
 
   output.value = results.join('\n')
+}
+
+const showGoodExample = () => {
+  badOutput.value = ''
+
+  const results = [
+    '--- 비지터 패턴 사용 ---',
+    '',
+    '현재 Element 클래스:',
+    '  - Circle (accept 메서드만 있음)',
+    '  - Square (accept 메서드만 있음)',
+    '',
+    '연산 1: 면적 계산',
+    '  → AreaCalculator Visitor 추가',
+    '  → Element 수정 없음',
+    '',
+    '연산 2: 둘레 계산',
+    '  → PerimeterCalculator Visitor 추가',
+    '  → Element 수정 없음',
+    '',
+    '연산 3: 색상 적용',
+    '  → ColorApplier Visitor 추가',
+    '  → Element 수정 없음',
+    '',
+    '✅ 새로운 연산 추가 시:',
+    '   - Visitor 클래스 1개만 추가',
+    '   - Circle, Square 코드 수정 불필요',
+    '   - 데이터(Element)와 로직(Visitor) 분리',
+  ]
+
+  goodOutput.value = results.join('\n')
+}
+
+const showBadExample = () => {
+  goodOutput.value = ''
+
+  const results = [
+    '--- Element에 메서드 추가 방식 (비지터 미사용) ---',
+    '',
+    '연산 1: 면적 계산 추가',
+    '  class Circle {',
+    '    getArea() { /* 면적 계산 */ }',
+    '  }',
+    '  class Square {',
+    '    getArea() { /* 면적 계산 */ }',
+    '  }',
+    '  → Circle, Square 둘 다 수정',
+    '',
+    '연산 2: 둘레 계산 추가',
+    '  class Circle {',
+    '    getPerimeter() { /* 둘레 계산 */ }',
+    '  }',
+    '  class Square {',
+    '    getPerimeter() { /* 둘레 계산 */ }',
+    '  }',
+    '  → Circle, Square 둘 다 또 수정',
+    '',
+    '연산 3: 색상 적용 추가',
+    '  → Circle, Square 둘 다 또 또 수정...',
+    '',
+    '❌ 문제점:',
+    '   - 연산 추가 시마다 모든 Element 수정',
+    '   - 로직이 여러 클래스에 분산',
+    '   - 유지보수 어려움',
+  ]
+
+  badOutput.value = results.join('\n')
 }
 
 const codeExample = `// 1. Visitor (방문자 인터페이스)
@@ -233,7 +328,8 @@ h2 {
   box-shadow: 0 4px 15px rgba(255, 236, 210, 0.1);
 }
 
-.example-section {
+.example-section,
+.comparison-section {
   background: rgba(255, 255, 255, 0.9);
   padding: 2rem;
   border-radius: 25px;
@@ -242,13 +338,15 @@ h2 {
   box-shadow: 0 8px 25px rgba(252, 182, 159, 0.1);
 }
 
-.example-section h3 {
+.example-section h3,
+.comparison-section h3 {
   margin-top: 0;
   color: #ffaa77;
   font-size: 1.5rem;
   font-weight: 700;
 }
-.example-section p {
+.example-section p,
+.comparison-section p {
   font-size: 16px;
   color: #555;
   line-height: 1.7;
@@ -261,18 +359,23 @@ h2 {
   flex-wrap: wrap;
 }
 
-.test-btn {
-  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-  color: white;
+.test-btn,
+.good-btn,
+.bad-btn {
   border: none;
   padding: 1rem 2rem;
   border-radius: 50px;
   cursor: pointer;
   font-weight: 700;
   font-size: 15px;
-  box-shadow: 0 6px 20px rgba(252, 182, 159, 0.3);
   transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   margin-top: 0.5rem;
+}
+
+.test-btn {
+  background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+  color: white;
+  box-shadow: 0 6px 20px rgba(252, 182, 159, 0.3);
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 .test-btn:hover {
@@ -281,6 +384,26 @@ h2 {
 }
 .test-btn:active {
   transform: translateY(0) scale(0.98);
+}
+
+.good-btn {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  color: white;
+  box-shadow: 0 6px 20px rgba(67, 233, 123, 0.3);
+}
+.good-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(67, 233, 123, 0.4);
+}
+
+.bad-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+  color: white;
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+}
+.bad-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
 }
 
 .output {
@@ -297,6 +420,35 @@ h2 {
   border: 3px solid rgba(255, 255, 255, 0.2);
   max-height: 300px;
   overflow-y: auto;
+}
+
+.good-output {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  border: 3px solid rgba(67, 233, 123, 0.3);
+  box-shadow: 0 8px 25px rgba(67, 233, 123, 0.3);
+}
+
+.bad-output {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+  border: 3px solid rgba(255, 107, 107, 0.3);
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+}
+
+.output-header {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  padding-bottom: 0.8rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.explanation {
+  margin-top: 1.2rem;
+  padding-top: 1.2rem;
+  border-top: 2px solid rgba(255, 255, 255, 0.3);
+  font-size: 14px;
+  line-height: 1.7;
+  font-family: 'Segoe UI', Arial, sans-serif;
 }
 
 .code-section {
