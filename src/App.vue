@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { shallowRef, type Component } from 'vue'
+import { shallowRef, type Component, markRaw } from 'vue'
 
 // 1. 생성 패턴 (Creational)
 import SingletonEx from './patterns/singleton-ex.vue'
@@ -42,28 +42,28 @@ import VisitorEx from './patterns/visitor-ex.vue'
 import StateEx from './patterns/state-ex.vue'
 
 // 네비게이션 및 동적 컴포넌트 목록
-const patterns: { key: string; name: string; component: Component }[] = [
+const patterns = [
   // 생성
-  { key: 'singleton', name: '1. Singleton', component: shallowRef(SingletonEx) },
-  { key: 'factoryMethod', name: '2. Factory Method', component: shallowRef(FactoryMethodEx) },
+  { key: 'singleton', name: '1. Singleton', component: markRaw(SingletonEx) },
+  { key: 'factoryMethod', name: '2. Factory Method', component: markRaw(FactoryMethodEx) },
   {
     key: 'abstractFactory',
     name: '3. Abstract Factory',
-    component: shallowRef(AbstractFactoryEx),
+    component: markRaw(AbstractFactoryEx),
   },
   // 구조
-  { key: 'adapter', name: '4. Adapter', component: shallowRef(AdaptorEx) },
-  { key: 'decorator', name: '5. Decorator', component: shallowRef(DecoratorEx) },
-  { key: 'proxy', name: '6. Proxy', component: shallowRef(ProxyEx) },
+  { key: 'adapter', name: '4. Adapter', component: markRaw(AdaptorEx) },
+  { key: 'decorator', name: '5. Decorator', component: markRaw(DecoratorEx) },
+  { key: 'proxy', name: '6. Proxy', component: markRaw(ProxyEx) },
   // 행위
-  { key: 'observer', name: '7. Observer', component: shallowRef(ObserverEx) },
-  { key: 'visitor', name: '8. Visitor', component: shallowRef(VisitorEx) },
-  { key: 'state', name: '9. State', component: shallowRef(StateEx) },
-]
+  { key: 'observer', name: '7. Observer', component: markRaw(ObserverEx) },
+  { key: 'visitor', name: '8. Visitor', component: markRaw(VisitorEx) },
+  { key: 'state', name: '9. State', component: markRaw(StateEx) },
+] as const
 
 // 현재 선택된 패턴 컴포넌트 (기본값: 싱글톤)
 // Vue 3에서 동적 컴포넌트는 성능을 위해 'shallowRef'를 사용하는 것이 권장됩니다.
-const currentPattern = shallowRef(SingletonEx)
+const currentPattern = shallowRef<Component>(SingletonEx)
 </script>
 
 <style>

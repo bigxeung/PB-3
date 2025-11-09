@@ -76,7 +76,10 @@ class AnalyticsAdapter implements AnalyticsService {
 class Client {
   // 클라이언트는 Target 인터페이스 타입의 객체를 주입받음
   public sendData(service: AnalyticsService) {
-    const dataToLog = { type: 'purchase', amount: 15000 }
+    const dataToLog: { type: 'click' | 'purchase'; amount: number } = {
+      type: 'purchase',
+      amount: 15000
+    }
 
     // 클라이언트는 Target의 메서드(sendRequest)만 알고 호출
     return service.sendRequest(dataToLog)
