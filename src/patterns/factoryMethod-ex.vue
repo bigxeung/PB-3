@@ -23,7 +23,9 @@
       <p>팩토리 메서드 패턴을 사용했을 때와 사용하지 않았을 때의 차이를 확인해보세요.</p>
 
       <div class="button-group">
-        <button @click="showGoodExample" class="good-btn">✅ 올바른 방법 (팩토리 메서드 사용)</button>
+        <button @click="showGoodExample" class="good-btn">
+          ✅ 올바른 방법 (팩토리 메서드 사용)
+        </button>
         <button @click="showBadExample" class="bad-btn">❌ 잘못된 방법 (직접 생성)</button>
       </div>
 
@@ -31,7 +33,8 @@
         <div class="output-header">✅ 올바른 방법: 팩토리 메서드 사용</div>
         <pre>{{ goodOutput }}</pre>
         <div class="explanation">
-          💡 <strong>장점:</strong> 클라이언트 코드는 추상 인터페이스만 사용하므로 느슨한 결합이 유지됩니다. 새로운 운송 수단(비행기 등)을 추가해도 클라이언트 코드 수정이 불필요합니다.
+          💡 <strong>장점:</strong> 클라이언트 코드는 추상 인터페이스만 사용하므로 느슨한 결합이
+          유지됩니다. 새로운 운송 수단(비행기 등)을 추가해도 클라이언트 코드 수정이 불필요합니다.
         </div>
       </div>
 
@@ -39,7 +42,8 @@
         <div class="output-header">❌ 잘못된 방법: 클라이언트가 직접 구체 클래스 생성</div>
         <pre>{{ badOutput }}</pre>
         <div class="explanation">
-          ⚠️ <strong>문제점:</strong> 클라이언트 코드가 구체 클래스(Truck, Ship)에 직접 의존하여 강한 결합이 발생합니다. 새로운 운송 수단을 추가하면 클라이언트 코드도 수정해야 합니다.
+          ⚠️ <strong>문제점:</strong> 클라이언트 코드가 구체 클래스(Truck, Ship)에 직접 의존하여
+          강한 결합이 발생합니다. 새로운 운송 수단을 추가하면 클라이언트 코드도 수정해야 합니다.
         </div>
       </div>
     </div>
@@ -283,7 +287,8 @@ h2 {
   box-shadow: 0 4px 15px rgba(79, 172, 254, 0.1);
 }
 
-.example-section {
+.example-section,
+.comparison-section {
   background: rgba(255, 255, 255, 0.9);
   padding: 2rem;
   border-radius: 25px;
@@ -292,13 +297,15 @@ h2 {
   box-shadow: 0 8px 25px rgba(79, 172, 254, 0.1);
 }
 
-.example-section h3 {
+.example-section h3,
+.comparison-section h3 {
   margin-top: 0;
   color: #00b4d8;
   font-size: 1.5rem;
   font-weight: 700;
 }
-.example-section p {
+.example-section p,
+.comparison-section p {
   font-size: 16px;
   color: #555;
   line-height: 1.7;
@@ -311,18 +318,23 @@ h2 {
   flex-wrap: wrap;
 }
 
-.test-btn {
-  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  color: white;
+.test-btn,
+.good-btn,
+.bad-btn {
   border: none;
   padding: 1rem 2rem;
   border-radius: 50px;
   cursor: pointer;
   font-weight: 700;
   font-size: 15px;
-  box-shadow: 0 6px 20px rgba(79, 172, 254, 0.3);
   transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   margin-top: 0.5rem;
+}
+
+.test-btn {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  color: white;
+  box-shadow: 0 6px 20px rgba(79, 172, 254, 0.3);
 }
 .test-btn:hover {
   transform: translateY(-3px) scale(1.05);
@@ -330,6 +342,26 @@ h2 {
 }
 .test-btn:active {
   transform: translateY(0) scale(0.98);
+}
+
+.good-btn {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  color: white;
+  box-shadow: 0 6px 20px rgba(67, 233, 123, 0.3);
+}
+.good-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(67, 233, 123, 0.4);
+}
+
+.bad-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff8e53 100%);
+  color: white;
+  box-shadow: 0 6px 20px rgba(255, 107, 107, 0.3);
+}
+.bad-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
 }
 
 .output {
